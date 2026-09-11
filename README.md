@@ -330,9 +330,9 @@ redis-cli keys "*"
 
 ## Testing
 
-1. **Start the Infrastructure:** Launch both Redis and `microservices-bootstrap`. Obtain a JWT token via `POST http://localhost:9090` (refer to the [microservices-bootstrap README](#https://github.com/sam888/microservices-bootstrap) for instructions).
+1. **Start the Infrastructure:** Launch both Redis and `microservices-bootstrap`. Obtain a JWT token via `POST http://localhost:9090/auth/token` (refer to the [microservices-bootstrap README](#https://github.com/sam888/microservices-bootstrap) for instructions).
 
-2. **Verify Initial Response (Cache Miss):** Call `GET http://localhost:9090/members/10800838383`. The initial request will take at least **500ms** to return mock data. This delay is introduced artificially in `MemberService.getMemberDetailsByDatabase(...)` to simulate database processing time:
+2. **Verify Initial Response (Cache Miss):** Use JWT token obtained from step 1 to call `HTTP GET http://localhost:9090/members/10800838383`. The initial request will take at least **500ms** to return mock data. This delay is introduced artificially in `MemberService.getMemberDetailsByDatabase(...)` to simulate database processing time:
 
    ```java
    // Simulate taking 500ms to process
@@ -340,7 +340,7 @@ redis-cli keys "*"
               .delayElement(Duration.ofMillis(500));
    ```
 
-2. **Verify Caching (Cache Hit):** Execute the same `GET` request a second time. The response time will drop to **< 30ms**, confirming that the Redis cache is working as expected. The circuit is now CLOSED.
+3. **Verify Caching (Cache Hit):** Execute the same `GET` request a second time. The response time will drop to **< 30ms**, confirming that the Redis cache is working as expected. The circuit is now CLOSED.
 
 <a href="images/postman.png">
 <img src="images/postman.png" width="600" alt="Click to enlarge">
